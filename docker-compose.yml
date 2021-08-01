@@ -1,0 +1,89 @@
+
+version: "3"
+
+networks:
+  private_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.1.0.0/24
+        
+services:
+  unbound:
+    image: "mvance/unbound:latest"
+    container_name: unbound
+    restart: unless-stopped
+    hostname: "unbound"
+    volumes:
+      - "./unbound:/opt/unbound/etc/unbound/"
+    networks:
+      private_network:
+        ipv4_address: 10.1.0.2
+
+  wireguard:
+    depends_on: [unbound, pihole]
+    image: linuxserver/wireguard
+    container_name: wireguard
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - SERVERPORT=51820
+      - PEERS=1
+      - PEERDNS=10.1.0.1
+      - INTERNAL_SUBNET=10.6.0.0
+      - ALLOWEDIPS=10.1.0.0/24 # To hide client IP address on Internet 0.0.0.0/0
+    volumes:
+      - ./wireguard:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - "51820:51820/udp"
+    dns:
+      - 10.1.0.1
+      - 10.1.0.2
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+    networks:
+      private_network:
+        ipv4_address: 10.1.0.3
+
+  pihole:
+    depends_on: [unbound]
+    container_name: pihole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    hostname: pihole
+    dns:
+      - 127.0.0.1
+      - 10.1.0.2
+    environment:
+      TZ: "America/Los_Angeles"
+      WEBPASSWORD: ""
+      ServerIP: 10.2.0.1
+      DNS1: 10.1.0.2
+      DNS2: 10.1.0.2
+    volumes:
+      - "./etc-pihole/:/etc/pihole/"
+      - "./etc-dnsmasq.d/:/etc/dnsmasq.d/"
+    cap_add:
+      - NET_ADMIN
+    networks:
+      private_network:
+        ipv4_address: 10.1.0.1
+
+  yacht:
+    container_name: yacht
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    volumes:
+      - yacht:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    image: selfhostedpro/yacht
+
+volumes:
+  yacht:
