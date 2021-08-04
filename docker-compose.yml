@@ -1,16 +1,13 @@
-
 version: "3"
 
 volumes:
-    pihole:
+    pihole-etc-pihole:
+    pihole-etc-dnsmasq.d:
     wireguard:
-    portainer:
+    portainer_data:
 
 networks:
-  agent_network:
-    driver: overlay
-    attachable: true
-  private_network:
+  vpn_network:
     ipam:
       driver: default
       config:
@@ -25,7 +22,7 @@ services:
     volumes:
       - "./unbound:/opt/unbound/etc/unbound/"
     networks:
-      private_network:
+      vpn_network:
         ipv4_address: 10.2.0.200
 
   wireguard:
@@ -56,7 +53,7 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
     networks:
-      private_network:
+      vpn_network:
         ipv4_address: 10.2.0.3
 
   pihole:
@@ -75,37 +72,23 @@ services:
       DNS1: 10.2.0.200
       DNS2: 10.2.0.200
     volumes:
-      - "pihole/etc-pihole/:/etc/pihole/"
-      - "pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/"
+      - "pihole-etc-pihole/:/etc/pihole/"
+      - "pihole-etc-dnsmasq.d/:/etc/dnsmasq.d/"
     cap_add:
       - NET_ADMIN
     networks:
-      private_network:
+      vpn_network:
         ipv4_address: 10.2.0.100
-
-  agent:
-    image: portainer/agent
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes
-    networks:
-      - agent_network
-    deploy:
-      mode: global
-      placement:
-        constraints: [node.platform.os == linux]
 
   portainer:
     image: portainer/portainer-ce
-    command: -H tcp://tasks.agent:9001 --tlsskipverify
-    # ports:
-    #   - "9000:9000"
-    #   - "8000:8000"
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
     volumes:
-      - portainer:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
     networks:
-      - agent_network
-      private_network:
+      vpn_network:
         ipv4_address: 10.2.0.101
 
     deploy:
