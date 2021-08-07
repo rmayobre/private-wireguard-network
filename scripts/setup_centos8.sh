@@ -61,7 +61,7 @@ echo "" >> /etc/wireguard/peer1/peer1.conf
 echo "[Peer]" >> /etc/wireguard/peer1/peer1.conf
 echo "PublicKey = ${serverpublickey}" >> /etc/wireguard/peer1/peer1.conf
 echo "Endpoint = ${endpoint}:51820" >> /etc/wireguard/peer1/peer1.conf
-echo "AllowedIPs = 0.0.0.0/0, ::/0" >> /etc/wireguard/peer1/peer1.conf
+echo "AllowedIPs = 10.0.0.0/24" >> /etc/wireguard/peer1/peer1.conf
 
 # Start wg0 interface on boot.
 systemctl enable wg-quick@wg0
