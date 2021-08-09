@@ -31,7 +31,7 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - SERVERPORT=51821
-      - PEERS=1
+      - PEERS=5
       - PEERDNS=auto
       - INTERNAL_SUBNET=12.6.0.0
       - ALLOWEDIPS=12.2.0.0/24
