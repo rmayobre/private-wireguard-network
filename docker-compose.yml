@@ -20,7 +20,6 @@ networks:
         - subnet: 10.2.0.0/24
 
 services:
-
   wireguardAdmin:
     image: linuxserver/wireguard
     container_name: wireguard-admin
@@ -31,7 +30,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
-      - SERVERPORT=51820
+      - SERVERPORT=51821
       - PEERS=1
       - PEERDNS=auto
       - INTERNAL_SUBNET=12.6.0.0
@@ -40,7 +39,7 @@ services:
       - wireguard_admin:/config
       - /lib/modules:/lib/modules
     ports:
-      - "51820:51820/udp"
+      - "51821:51821/udp"
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
@@ -82,16 +81,16 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
-      - SERVERPORT=51821
+      - SERVERPORT=51820
       - PEERS=1
       - PEERDNS=10.2.0.100
       - INTERNAL_SUBNET=10.6.0.0
-      - ALLOWEDIPS=10.2.0.0/24 # To hide client IP address on Internet 0.0.0.0/0
+      - ALLOWEDIPS=10.2.0.0/24
     volumes:
       - wireguard:/config
       - /lib/modules:/lib/modules
     ports:
-      - "51821:51821/udp"
+      - "51820:51820/udp"
     dns:
       - 10.2.0.100
       - 10.2.0.200
@@ -104,8 +103,8 @@ services:
 
   pihole:
     depends_on: [unbound]
-    image: pihole/pihole:latest
     container_name: pihole
+    image: pihole/pihole:latest
     restart: unless-stopped
     hostname: pihole
     dns:
