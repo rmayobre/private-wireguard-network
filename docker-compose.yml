@@ -1,19 +1,65 @@
-version: "3"
+version: "3.9"
 
 volumes:
     pihole-etc-pihole:
     pihole-etc-dnsmasq.d:
     wireguard:
+    wireguard_admin:
     portainer_data:
 
 networks:
-  vpn_network:
+  admin_network:
+    ipam:
+      driver: default
+      config:
+        - subnet: 12.2.0.0/24
+  private_network:
     ipam:
       driver: default
       config:
         - subnet: 10.2.0.0/24
 
 services:
+
+  wireguardAdmin:
+    image: linuxserver/wireguard
+    container_name: wireguard-admin
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - SERVERPORT=51820
+      - PEERS=1
+      - PEERDNS=auto
+      - INTERNAL_SUBNET=12.6.0.0
+      - ALLOWEDIPS=12.2.0.0/24
+    volumes:
+      - wireguard_admin:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - "51820:51820/udp"
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    restart: unless-stopped
+    networks:
+      admin_network:
+        ipv4_address: 12.2.0.3
+
+  portainer:
+    image: portainer/portainer-ce
+    container_name: protainer-ui
+    restart: unless-stopped
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      admin_network:
+        ipv4_address: 12.2.0.100
+
   unbound:
     image: "mvance/unbound:latest"
     container_name: unbound
@@ -22,7 +68,7 @@ services:
     volumes:
       - "./unbound:/opt/unbound/etc/unbound/"
     networks:
-      vpn_network:
+      private_network:
         ipv4_address: 10.2.0.200
 
   wireguard:
@@ -53,7 +99,7 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
     networks:
-      vpn_network:
+      private_network:
         ipv4_address: 10.2.0.3
 
   pihole:
@@ -77,13 +123,5 @@ services:
     cap_add:
       - NET_ADMIN
     networks:
-      vpn_network:
+      private_network:
         ipv4_address: 10.2.0.100
-
-  portainer:
-    image: portainer/portainer-ce
-    restart: unless-stopped
-    command: -H unix:///var/run/docker.sock
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
