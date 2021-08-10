@@ -82,7 +82,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/New_York
-      - SERVERPORT=51820
+      - SERVERPORT=50000
       - PEERS=1
       - PEERDNS=10.2.0.100
       - INTERNAL_SUBNET=10.6.0.0
@@ -91,7 +91,7 @@ services:
       - wireguard:/config
       - /lib/modules:/lib/modules
     ports:
-      - "51821:51820/udp"
+      - "50000:51820/udp"
     dns:
       - 10.2.0.100
       - 10.2.0.200
