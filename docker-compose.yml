@@ -1,19 +1,26 @@
 version: "3.9"
 
 volumes:
-    pihole-etc-pihole:
-    pihole-etc-dnsmasq.d:
-    wireguard:
-    wireguard_admin:
-    portainer_data:
+    pihole-etc-pihole-volume:
+      name: pihole-etc-pihole
+    pihole-etc-dnsmasq.d-volume:
+      name: pihole-etc-dnsmasq.d
+    wireguard-private-volume:
+      name: wireguard-private-config
+    wireguard-admin-volume:
+      name: wireguard-admin-config
+    portainer-data-volume:
+      name: portainer-data
 
 networks:
-  admin_network:
+  admin-network:
+    name: wireguard-admin
     ipam:
       driver: default
       config:
         - subnet: 12.2.0.0/24
-  private_network:
+  private-network:
+    name: wireguard-private
     ipam:
       driver: default
       config:
@@ -21,7 +28,7 @@ networks:
 
 services:
 
-  wireguardAdmin:
+  wireguard-admin:
     image: linuxserver/wireguard
     container_name: wireguard-admin
     cap_add:
@@ -33,11 +40,10 @@ services:
       - TZ=America/New_York
       - SERVERPORT=7000
       - PEERS=1
-      - PEERDNS=auto
       - INTERNAL_SUBNET=12.6.0.0
       - ALLOWEDIPS=12.2.0.0/24
     volumes:
-      - wireguard_admin:/config
+      - wireguard-admin-volume:/config
       - /lib/modules:/lib/modules
     ports:
       - "7000:51820/udp"
@@ -45,7 +51,7 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
     networks:
-      admin_network:
+      admin-network:
         ipv4_address: 12.2.0.3
 
   portainer:
@@ -55,9 +61,9 @@ services:
     command: -H unix:///var/run/docker.sock
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - portainer-data-volume:/data
     networks:
-      admin_network:
+      admin-network:
         ipv4_address: 12.2.0.100
 
   unbound:
@@ -68,13 +74,13 @@ services:
     volumes:
       - "./unbound:/opt/unbound/etc/unbound/"
     networks:
-      private_network:
+      private-network:
         ipv4_address: 10.2.0.200
 
-  wireguard:
+  wireguard-private:
     depends_on: [unbound, pihole]
     image: linuxserver/wireguard
-    container_name: wireguard
+    container_name: wireguard-private
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -86,9 +92,8 @@ services:
       - PEERS=1
       - PEERDNS=10.2.0.100
       - INTERNAL_SUBNET=10.6.0.0
-      - ALLOWEDIPS=10.2.0.0/24 # To hide client IP address on Internet 0.0.0.0/0
     volumes:
-      - wireguard:/config
+      - wireguard-private-volume:/config
       - /lib/modules:/lib/modules
     ports:
       - "50000:51820/udp"
@@ -99,7 +104,7 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
     networks:
-      private_network:
+      private-network:
         ipv4_address: 10.2.0.3
 
   pihole:
@@ -118,10 +123,10 @@ services:
       DNS1: 10.2.0.200
       DNS2: 10.2.0.200
     volumes:
-      - "pihole-etc-pihole/:/etc/pihole/"
-      - "pihole-etc-dnsmasq.d/:/etc/dnsmasq.d/"
+      - pihole-etc-pihole-volume/:/etc/pihole/
+      - pihole-etc-dnsmasq.d-volume/:/etc/dnsmasq.d/
     cap_add:
       - NET_ADMIN
     networks:
-      private_network:
+      private-network:
         ipv4_address: 10.2.0.100
