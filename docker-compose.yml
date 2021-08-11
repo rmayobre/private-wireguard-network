@@ -42,7 +42,6 @@ services:
       - PEERS=1
       - PEERDNS=1.1.1.1
       - INTERNAL_SUBNET=12.6.0.0
-      - ALLOWEDIPS=12.2.0.0/24
     volumes:
       - wireguard-admin-volume:/config
       - /lib/modules:/lib/modules
