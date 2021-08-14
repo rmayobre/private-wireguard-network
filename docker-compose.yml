@@ -1,16 +1,16 @@
 version: "3.9"
 
 volumes:
-    pihole-etc-pihole-volume:
-      name: pihole-etc-pihole
-    pihole-etc-dnsmasq.d-volume:
-      name: pihole-etc-dnsmasq.d
-    wireguard-private-volume:
-      name: wireguard-private-config
-    wireguard-admin-volume:
-      name: wireguard-admin-config
-    portainer-data-volume:
-      name: portainer-data
+  pihole-volume:
+    name: pihole
+  dnsmasq.d-volume:
+    name: pihole-dnsmasq.d
+  wireguard-private-volume:
+    name: wireguard-private-config
+  wireguard-admin-volume:
+    name: wireguard-admin-config
+  portainer-data-volume:
+    name: portainer-data
 
 networks:
   admin-network:
@@ -27,7 +27,6 @@ networks:
         - subnet: 10.2.0.0/24
 
 services:
-
   wireguard-admin:
     image: linuxserver/wireguard
     container_name: wireguard-admin
@@ -53,7 +52,7 @@ services:
     networks:
       admin-network:
         ipv4_address: 12.2.0.3
-
+        
   portainer:
     image: portainer/portainer-ce
     container_name: protainer-ui
@@ -117,14 +116,14 @@ services:
       - 127.0.0.1
       - 10.2.0.200
     environment:
-      TZ: "America/Los_Angeles"
+      TZ: "America/New_York"
       WEBPASSWORD: ""
       ServerIP: 10.1.0.100
       DNS1: 10.2.0.200
       DNS2: 10.2.0.200
     volumes:
-      - pihole-etc-pihole-volume/:/etc/pihole/
-      - pihole-etc-dnsmasq.d-volume/:/etc/dnsmasq.d/
+      - pihole-volume/:/etc/pihole/
+      - pihole-dnsmasq.d-volume/:/etc/dnsmasq.d/
     cap_add:
       - NET_ADMIN
     networks:
