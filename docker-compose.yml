@@ -32,6 +32,7 @@ services:
 ######################
   agent:
     image: portainer/agent
+    container_name: portainer-agent
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -42,6 +43,7 @@ services:
 
   portainer:
     image: portainer/portainer-ce
+    container_name: portainer-ui
     restart: unless-stopped
     volumes:
       - portainer-data-volume:/data
