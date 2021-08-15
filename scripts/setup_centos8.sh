@@ -5,7 +5,7 @@
 ########################
 
 # Install EPEL Release Repo
-dnf install epel-release elrepo-release -y
+dnf install -y epel-release
 
 # Install Wireguard kernel module repo
 dnf copr enable -y jdoss/wireguard
