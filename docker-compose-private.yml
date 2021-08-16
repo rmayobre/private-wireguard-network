@@ -71,8 +71,9 @@ services:
       TZ: "America/New_York"
       WEBPASSWORD: ""
       ServerIP: 10.1.0.100
-      DNS1: 10.2.0.200 # points to Unbound
-      DNS2: 10.2.0.200 # points to Unbound
+      PIHOLE_DNS_: 10.2.0.200;10.2.0.200 # points to Unbound
+      # DNS1: 10.2.0.200 # points to Unbound - DEPRECATED
+      # DNS2: 10.2.0.200 # points to Unbound - DEPRECATED
     volumes:
       - pihole-volume/:/etc/pihole/
       - dnsmasq.d-volume/:/etc/dnsmasq.d/
