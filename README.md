@@ -41,6 +41,23 @@ chmod +x ./scripts/setup_centos8.sh
 ./scripts/setup_centos8.sh
 ```
 
+## Ubuntu Script
+For `Ubuntu` based distros, there is a setup script to help install required dependencies and then run the `docker-compose.yml` file.
+
+```bash
+# Update and install Git.
+dnf update -y
+dnf install git -y
+
+# Clone repo and change directories.
+git clone https://github.com/rmayobre/private-wireguard-network.git
+cd private-wireguard-network
+
+# Give script executable permissions and run.
+chmod +x ./scripts/setup_ubuntu.sh
+./scripts/setup_ubuntu.sh
+```
+
 # Gaining Access
 How to gain access to the PWN networks. **NOTE**: Once you have access to admin network, you can download all `Wireguard` conf files from `Portainer` (requires Portainer configuration).
 

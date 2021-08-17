@@ -40,4 +40,5 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 #      PWN SETUP       #
 ########################
 
-docker-compose up -d
+docker-compose -f docker-compose-admin.yml -p "pwn-admin" up -d
+docker-compose -f docker-compose-private.yml -p "pwn-private" up -d
