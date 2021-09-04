@@ -43,6 +43,7 @@ services:
       - PEERS=1 # Number of Client profiles (Change change this in portainer)
       - PEERDNS=10.2.0.100 # points to Pihole
       - INTERNAL_SUBNET=10.6.0.0 # Subnet for all wireguard connections.
+      - ALLOWEDIPS='10.6.0.0/24, 10.2.0.0/24' # To tunnel all network, remove this line.'
     volumes:
       - wireguard-private-volume:/config
       - /lib/modules:/lib/modules
