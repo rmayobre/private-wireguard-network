@@ -48,8 +48,9 @@ services:
       - TZ=America/New_York # Change to your timezone.
       - SERVERPORT=7000 # 
       - PEERS=1 # Number of client profiles.
-      - PEERDNS=1.1.1.1 # DNS when client is connected.
+      - PEERDNS=''
       - INTERNAL_SUBNET=12.6.0.0 # Subnet for all wireguard connections.
+      - ALLOWEDIPS=12.2.0.0/24 # Split tunnel only to local services (e.g. portainer)
     volumes:
       - wireguard-admin-volume:/config
       - /lib/modules:/lib/modules
