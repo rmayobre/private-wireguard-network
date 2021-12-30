@@ -1,6 +1,11 @@
 # Private Wireguard Network (PWN)
 A dual `Wireguard` network configuration to help seperate common use services from admin tools. The admin network (pwn-admin) comes with `Portainer`, as well as a `Portainer Agent`, to help manage `Docker` containers. The private network (pwn-private) comes with a `Pi-Hole` and `Unbound` configuration to provide ad-blocking and a caching DNS resolver.
 
+## Archived - 12/30/21
+This project has been archieved in favor of a new approach to a Wireguard networking stack ([link](https://github.com/rmayobre/easy-pwn)). This project still works as of writing this update to the `README`, however, I will not be applying bug fixes to the scripts or docker-compose file.
+
+I would recommend trying the new stack I created in the link above, as it address some issues with managing the peer connections of the Wireguard server.
+
 ## Admin Network
 * 12.2.0.0/24 - Admin Network's subnet
 * 12.6.0.0/24 - Admin Wireguard's internal subnet
